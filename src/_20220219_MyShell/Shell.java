@@ -55,7 +55,10 @@ public class Shell {
                 }
 
                 if (numArgs == 3 && "scp".equals(commandStr)) {
-
+                    String ip = commandlineElements[1];
+                    String serverFilename = commandlineElements[2];
+                    String clientFilename = commandlineElements[3];
+                    command = new SecureCopy(ip, serverFilename, clientFilename);
                 }
             } catch (NotCreateCommandException notCreateCommandException) {
                 notCreateCommandException.printStackTrace();

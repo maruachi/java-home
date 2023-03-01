@@ -1,6 +1,6 @@
 package _20220219_MyShell;
 
-public class NotCreateCommandException extends Exception {
+public class NotCreateCommandException extends RuntimeException {
     public NotCreateCommandException() {
         super();
     }
