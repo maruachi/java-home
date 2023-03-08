@@ -10,7 +10,7 @@ public class Cat extends Command {
         super(inputStream, outputStream);
     }
 
-    public Commandable createByFilename(String filename, OutputStream outputStream) {
+    public static Commandable createByFilename(String filename, OutputStream outputStream) {
         if (Files.notExists(Paths.get(filename))) {
             return new EmptyCommand();
         }

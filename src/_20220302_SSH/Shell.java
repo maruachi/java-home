@@ -35,15 +35,19 @@ public class Shell {
 
             if (numCommandLineElements == 2 && "cat".equals(commandLineElements[0])) {
                 String filename = commandLineElements[1];
-                command = new Cat2(filename, outputStream);
+                command = Cat.createByFilename(filename, outputStream);
             }
 
             if (numCommandLineElements == 3 && "cp".equals(commandLineElements[0])) {
-
+                String soureFilename = commandLineElements[1];
+                String targetFilename = commandLineElements[2];
+                command = Copy.createByFilename(soureFilename, targetFilename);
             }
 
             if (numCommandLineElements == 3 && "mv".equals(commandLineElements[0])) {
-
+                String soureFilename = commandLineElements[1];
+                String targetFilename = commandLineElements[2];
+                command = Move.createByFilename(soureFilename, targetFilename);
             }
 
             if (numCommandLineElements == 4 && "scp".equals(commandLineElements[0])) {
@@ -59,7 +63,7 @@ public class Shell {
     }
 
     private void printBanner() {
-        Commandable cat = new Cat2("src/_20220302_SSH/banner.txt", outputStream);
+        Commandable cat = Cat.createByFilename("src/_20220302_SSH/banner.txt", outputStream);
         cat.execute();
     }
 

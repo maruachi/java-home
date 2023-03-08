@@ -10,7 +10,7 @@ public class Copy extends Command {
         super(inputStream, outputStream);
     }
 
-    public Commandable createByFilename(String sourceFilename, String targetFilename) {
+    public static Commandable createByFilename(String sourceFilename, String targetFilename) {
         if (Files.notExists(Paths.get(sourceFilename))) {
             return new EmptyCommand();
         }

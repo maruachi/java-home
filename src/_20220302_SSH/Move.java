@@ -12,20 +12,15 @@ public class Move extends Command {
         this.deleteFilename = deleteFilename;
     }
 
-
-    public Commandable createByFilename(String sourceFilename, String targetFilename) {
-        if (Files.notExists(Paths.get(sourceFilename))) {
-            return new EmptyCommand();
-        }
-
-        if (Files.exists(Paths.get(targetFilename))) {
+    public static Commandable createByFilename(String sourceFilename, String targetFilename) {
+        if (Files.notExists(Paths.get(sourceFilename)) || Files.exists(Paths.get(targetFilename))) {
             return new EmptyCommand();
         }
 
         try {
             InputStream inputStream = new FileInputStream(sourceFilename);
             OutputStream outputStream = new FileOutputStream(targetFilename);
-            return new Move(inputStream, outputStream, targetFilename);
+            return new Move(inputStream, outputStream, sourceFilename);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return new EmptyCommand();
