@@ -30,6 +30,5 @@ public class ServerListener implements Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

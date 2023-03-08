@@ -10,14 +10,41 @@ public class ChatServer {
     public static void main(String[] args) {
         try {
             ServerSocket serverSocket = new ServerSocket(7777);
-            while (true) {
-                Socket socket = serverSocket.accept();
-                System.out.println("클라이언트가 연결되었습니다.");
 
-                new Thread(new ClientHandler(socket)).start();
+            new Thread(new ClientListener(serverSocket)).start();
+
+            BufferedReader reader = toReader(System.in);
+
+            while (true) {
+                String line = reader.readLine();
+                int usernameIndex = line.indexOf(' ');
+                if (usernameIndex == -1) {
+                    System.out.println("아이디 메세지 형식으로 입력해주세요.");
+                }
+                String username = line.substring(0, usernameIndex);
+                String message = line.substring(usernameIndex + 1);
+
+                if ("all".equals(username)) {
+                    ClientHandler.broadcast(message);
+                    continue;
+                }
+
+                if (!ClientHandler.isChatUser(username)) {
+                    System.out.println("아이디가 존재하지 않습니다.");
+                    continue;
+                }
+
+                ClientHandler.sendTo(username, message);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    private static BufferedReader toReader(InputStream inputStream) {
+        BufferedInputStream bis = new BufferedInputStream(inputStream, 8192);
+        InputStreamReader isr = new InputStreamReader(bis, StandardCharsets.UTF_8);
+        return new BufferedReader(isr, 8192);
+    }
+
 }

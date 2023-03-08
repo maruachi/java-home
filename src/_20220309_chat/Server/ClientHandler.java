@@ -3,12 +3,13 @@ package _20220309_chat.Server;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.security.SignedObject;
 import java.text.MessageFormat;
 import java.util.HashMap;
 
 public class ClientHandler implements Runnable {
-    private final HashMap<String, String> users = new HashMap<>();
-    private final HashMap<String, Socket> clientSockets = new HashMap<>();
+    private static final HashMap<String, String> users = new HashMap<>();
+    private static final HashMap<String, Socket> clientSockets = new HashMap<>();
 
     {
         users.put("gyu", "123");
@@ -45,6 +46,7 @@ public class ClientHandler implements Runnable {
                 }
 
                 System.out.println("클라이언트 접속 성공했습니다.");
+                clientSockets.put(username, socket);
                 writer.write("SUCCESS");
                 writer.write("\n");
                 writer.flush();
@@ -89,5 +91,30 @@ public class ClientHandler implements Runnable {
         BufferedInputStream bis = new BufferedInputStream(inputStream, 8192);
         InputStreamReader reader = new InputStreamReader(bis, StandardCharsets.UTF_8);
         return new BufferedReader(reader, 8192);
+    }
+
+    public static boolean isChatUser(String username) {
+        return users.containsKey(username);
+    }
+
+    public static void sendTo(String username, String message) {
+        if (!isChatUser(username)) {
+            return;
+        }
+        Socket socket = clientSockets.get(username);
+        try {
+            Writer writer = toWriter(socket.getOutputStream());
+            writer.write(message);
+            writer.write('\n');
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void broadcast(String message) {
+        for (String username : clientSockets.keySet()) {
+            sendTo(username, message);
+        }
     }
 }
