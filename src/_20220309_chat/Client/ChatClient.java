@@ -7,55 +7,46 @@ import java.text.MessageFormat;
 
 public class ChatClient {
     public static void main(String[] args) {
-        try (Socket socket = new Socket("192.168.0.56", 7777);){
-            Reader clientInputStream = toReader(System.in);
+        try (Socket socket = new Socket("192.168.1.197", 7777);){
+            BufferedReader clientInputStream = toReader(System.in);
             Writer serverOutputStream = toWriter(socket.getOutputStream());
-            Reader serverInputStream = toReader(socket.getInputStream());
+            BufferedReader serverInputStream = toReader(socket.getInputStream());
 
-            int failCount = 0;
             char[] buffer = new char[1024];
+            int failCount = 0;
             while (true) {
                 if (failCount >= 2) {
+                    System.out.println("2회 이상 실패하면 프로그램이 종료됩니다.");
+                    socket.close();
                     return;
                 }
 
-                int len = clientInputStream.read(buffer);
-                if (len == -1) {
-                    break;
-                }
-
-                String string = new String(buffer, 0, len);
-                int newLineIndex = string.indexOf('\n');
-                if (newLineIndex == -1) {
-                    failCount++;
+                String loginLine = clientInputStream.readLine();
+                if (loginLine == null) {
                     continue;
                 }
-
-                String loginLine = string.substring(0, newLineIndex);
 
                 serverOutputStream.write(loginLine);
                 serverOutputStream.write("\n");
                 serverOutputStream.flush();
-                System.out.println(MessageFormat.format("로그인 시도 중입니다.", loginLine));
+                System.out.println("로그인 시도 중입니다.");
 
-                len = serverInputStream.read(buffer);
-                if (len == -1) {
-                    break;
-                }
-
-                newLineIndex = new String(buffer, 0, len).indexOf('\n');
-                if (newLineIndex == -1) {
+                String response = serverInputStream.readLine();
+                if (response == null) {
                     failCount++;
                     continue;
                 }
-                String response = new String(buffer, 0, newLineIndex);
 
 
                 if ("FAIL".equals(response)) {
                     failCount++;
-                    System.out.println("접속 실패...");
+                    System.out.println("접속 실패... 계정과 아이디를 다시 한번 확인해주세요");
+                    System.out.println(failCount);
                     continue;
                 }
+
+
+
 
                 if ("SUCCESS".equals(response)) {
                     System.out.println("접속 성공");
@@ -63,12 +54,9 @@ public class ChatClient {
                     new Thread(new ServerListener(socket)).start();
 
                     while (true) {
-                        len = clientInputStream.read(buffer);
-                        if (len == -1) {
-                            return;
-                        }
-                        String messageLine = new String(buffer, 0, len);
+                        String messageLine = clientInputStream.readLine();
                         serverOutputStream.write(messageLine);
+                        serverOutputStream.write('\n');
                         serverOutputStream.flush();
                     }
                 }
@@ -83,8 +71,9 @@ public class ChatClient {
         return new OutputStreamWriter(bos, StandardCharsets.UTF_8);
     }
 
-    private static InputStreamReader toReader(InputStream inputStream) {
+    private static BufferedReader toReader(InputStream inputStream) {
         BufferedInputStream bis = new BufferedInputStream(inputStream, 8192);
-        return new InputStreamReader(bis, StandardCharsets.UTF_8);
+        InputStreamReader reader = new InputStreamReader(bis, StandardCharsets.UTF_8);
+        return new BufferedReader(reader, 8192);
     }
 }

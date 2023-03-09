@@ -3,7 +3,6 @@ package _20220309_chat.Server;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.security.SignedObject;
 import java.text.MessageFormat;
 import java.util.HashMap;
 
@@ -25,13 +24,27 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
+
             BufferedReader reader = toReader(socket.getInputStream());
             Writer writer = toWriter(socket.getOutputStream());
             char[] buffer = new char[1000];
+            int failCount = 0;
             while (true) {
+                if (failCount >= 2) {
+                    System.out.println("2회 이상 실패하면 프로그램이 종료됩니다.");
+                    socket.close();
+                    return;
+                }
+
                 int len = reader.read(buffer);
                 String loginLine = new String(buffer, 0, len-1);
                 String[] loginLineElements = loginLine.split("[ ]+");
+                if (loginLineElements.length != 2) {
+                    System.out.println("클라이언트 접속 실패했습니다.");
+                    loginResponse(writer, "FAIL");
+                    failCount++;
+                    continue;
+                }
                 String username = loginLineElements[0];
                 String password = loginLineElements[1];
                 System.out.println(MessageFormat.format("username: {0} password: {1}", username, password));
@@ -39,17 +52,19 @@ public class ClientHandler implements Runnable {
 
                 if (!isAuthenticated(username, password)) {
                     System.out.println("클라이언트 접속 실패했습니다.");
-                    writer.write("FAIL");
-                    writer.write("\n");
-                    writer.flush();
+                    loginResponse(writer, "FAIL");
+                    failCount++;
                     continue;
+                }
+
+                if (failCount >= 2) {
+                    socket.close();
+                    return;
                 }
 
                 System.out.println("클라이언트 접속 성공했습니다.");
                 clientSockets.put(username, socket);
-                writer.write("SUCCESS");
-                writer.write("\n");
-                writer.flush();
+                loginResponse(writer, "SUCCESS");
 
                 Thread.sleep(500);
 
@@ -76,6 +91,12 @@ public class ClientHandler implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private void loginResponse(Writer writer, String response) throws IOException {
+        writer.write(response);
+        writer.write("\n");
+        writer.flush();
     }
 
     private boolean isAuthenticated(String username, String password) {

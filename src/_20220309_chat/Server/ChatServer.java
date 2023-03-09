@@ -19,7 +19,7 @@ public class ChatServer {
                 String line = reader.readLine();
                 int usernameIndex = line.indexOf(' ');
                 if (usernameIndex == -1) {
-                    System.out.println("아이디 메세지 형식으로 입력해주세요.");
+                    System.out.println("'아이디 메세지' 형식으로 입력해주세요.");
                 }
                 String username = line.substring(0, usernameIndex);
                 String message = line.substring(usernameIndex + 1);
