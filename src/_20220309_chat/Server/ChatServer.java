@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
+import java.time.LocalDate;
 import java.util.HashMap;
 
 public class ChatServer {
@@ -45,6 +47,11 @@ public class ChatServer {
         BufferedInputStream bis = new BufferedInputStream(inputStream, 8192);
         InputStreamReader isr = new InputStreamReader(bis, StandardCharsets.UTF_8);
         return new BufferedReader(isr, 8192);
+    }
+
+    private static OutputStreamWriter toWriter(OutputStream outputStream) {
+        BufferedOutputStream bos = new BufferedOutputStream(outputStream, 8192);
+        return new OutputStreamWriter(bos, StandardCharsets.UTF_8);
     }
 
 }

@@ -4,11 +4,16 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 
 public class ClientHandler implements Runnable {
     private static final HashMap<String, String> users = new HashMap<>();
     private static final HashMap<String, Socket> clientSockets = new HashMap<>();
+
+    public static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     {
         users.put("gyu", "123");
@@ -72,7 +77,10 @@ public class ClientHandler implements Runnable {
                 writer.write('\n');
                 writer.flush();
 
-                Writer serverWriter = toWriter(new FileOutputStream(MessageFormat.format("{0}.log", username)));
+                LocalDate localDate = LocalDate.now();
+
+                String stringDate = YYYY_MM_DD_FORMATTER.format(localDate);
+                Writer serverWriter = toWriter(new FileOutputStream(MessageFormat.format("{0}_{1}.log", username, stringDate),true));
                 while (true) {
                     String messageLine = reader.readLine();
                     if (messageLine == null) {
@@ -122,6 +130,18 @@ public class ClientHandler implements Runnable {
         if (!isChatUser(username)) {
             return;
         }
+
+        String stringDate = ClientHandler.YYYY_MM_DD_FORMATTER.format(LocalDate.now());
+        try {
+            Writer writer = toWriter(new FileOutputStream(MessageFormat.format("{0}_{1}.log", username, stringDate), true));
+            writer.write(message);
+            writer.write('\n');
+            writer.flush();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+
         Socket socket = clientSockets.get(username);
         try {
             Writer writer = toWriter(socket.getOutputStream());

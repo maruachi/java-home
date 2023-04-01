@@ -45,9 +45,6 @@ public class ChatClient {
                     continue;
                 }
 
-
-
-
                 if ("SUCCESS".equals(response)) {
                     System.out.println("접속 성공");
 
