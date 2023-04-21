@@ -60,6 +60,7 @@ public class Main {
 
     private static void create(Queue<Integer> usableTags, Set<Integer> tasks, Integer createFailCount) {
         if (usableTags.isEmpty()) {
+            //createFailCount는 Integer 객체로 immutable이라 아래 코드 수정 필요!
             createFailCount = new Integer(createFailCount + 1);
             return;
         }
