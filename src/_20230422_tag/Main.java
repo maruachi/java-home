@@ -29,15 +29,7 @@ public class Main {
                 throw new RuntimeException();
             }
 
-            Commandable commandable = new EmptyCommand();
-            if (Command.CREATE == command) {
-                commandable = new Create();
-            }
-
-            if (Command.EXECUTE == command) {
-                int tag = Integer.parseInt(lineElements[1]);
-                commandable = new Execute(tag);
-            }
+            Commandable commandable = createCommand(lineElements, command);
             commands.add(commandable);
         }
 
@@ -90,5 +82,18 @@ public class Main {
             System.out.print(MessageFormat.format( " " + "{0}({1})", entry.getKey(), entry.getValue()));
         }
         System.out.println();
+    }
+
+    private static Commandable createCommand(String[] lineElements, Command command) {
+        if (Command.CREATE == command) {
+            return new Create();
+        }
+
+        if (Command.EXECUTE == command) {
+            int tag = Integer.parseInt(lineElements[1]);
+            return new Execute(tag);
+        }
+
+        throw new RuntimeException();
     }
 }
