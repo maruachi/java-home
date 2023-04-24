@@ -15,9 +15,7 @@ public class Main {
         int N = Integer.parseInt(scanner.nextLine());
 
         // 데이터 입력 및 변환 컨텍스트
-        Set<Command> commandSet = new HashSet<>();
-        commandSet.add(Command.CREATE);
-        commandSet.add(Command.EXECUTE);
+        Set<Command> commandSet = new HashSet<>(Arrays.asList(Command.CREATE, Command.EXECUTE));
 
         Queue<Commandable> commands = new ArrayDeque<>();
         for (int i = 0; i < N; i++) {
@@ -46,16 +44,7 @@ public class Main {
         System.out.println(commands);
 
         // 처리 컨텍스트
-        Queue<Integer> tags = new PriorityQueue<>();
-        tags.add(1);
-        tags.add(2);
-        tags.add(3);
-        tags.add(4);
-        tags.add(5);
-        tags.add(6);
-        tags.add(7);
-        tags.add(8);
-        tags.add(9);
+        Queue<Integer> tags = new PriorityQueue<>(Arrays.asList(1,2,3,4,5,6,7,8,9));
         Set<Integer> usableTags = new HashSet<>();
 
         HashMap<Integer, Integer> failHistory = new HashMap<>();
