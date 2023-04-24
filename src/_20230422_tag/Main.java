@@ -33,8 +33,6 @@ public class Main {
             commands.add(commandable);
         }
 
-        System.out.println(commands);
-
         // 처리 컨텍스트
         Queue<Integer> tags = new PriorityQueue<>(Arrays.asList(1,2,3,4,5,6,7,8,9));
         Set<Integer> usableTags = new HashSet<>();
