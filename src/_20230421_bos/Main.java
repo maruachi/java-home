@@ -13,19 +13,18 @@ public class Main {
         byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
 
         InputStream inputStream = new ByteArrayInputStream(bytes);
-        InputStream bis = new BufferedInputStream(inputStream, 8192);
+        InputStream bis = new BufferedInputStream(inputStream, BUFFER_SIZE);
+        OutputStream bos = new BufferedOutputStream(System.out, BUFFER_SIZE);
 
-        OutputStream bos = new BufferedOutputStream(System.out, 8192);
-
-        byte[] buffer = new byte[8192];
-
+        byte[] buffer = new byte[BUFFER_SIZE];
         while (true) {
-            int len = inputStream.read(buffer);
+            int len = bis.read(buffer);
             if (len == -1) {
                 bos.flush();
                 break;
             }
             bos.write(buffer, 0, len);
         }
+
     }
 }
