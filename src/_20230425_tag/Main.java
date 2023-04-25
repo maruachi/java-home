@@ -47,7 +47,8 @@ public class Main {
 
         System.out.println("생성실패횟수: " + failCount.getOrDefault(Tag.createFailTag(), 0));
 
-        List<Map.Entry<Tag, Integer>> entries = failCount.entrySet().stream()
+        builder.setLength(0);
+        failCount.entrySet().stream()
                 .filter(entry -> entry.getKey().equals(Tag.createFailTag()))
                 .sorted(new Comparator<Map.Entry<Tag, Integer>>() {
                     @Override
@@ -60,12 +61,11 @@ public class Main {
                         return compareTo;
                     }
                 })
-                .collect(Collectors.toList());
-        builder.setLength(0);
-        for (Map.Entry<Tag, Integer> entry : entries) {
-            builder.append(' ');
-            builder.append(MessageFormat.format("{0}({1})", entry.getKey(), entry.getValue()));
-        }
+                .forEach(entry -> {
+                    builder.append(' ');
+                    builder.append(MessageFormat.format("{0}({1})", entry.getKey(), entry.getValue()));
+                });
+
         System.out.println("태그별 실행실패횟수: " + builder);
 
     }
