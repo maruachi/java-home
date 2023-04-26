@@ -16,4 +16,8 @@ public class ResultDto {
     public boolean isSuccess() {
         return success;
     }
+
+    public boolean isFail() {
+        return !isSuccess();
+    }
 }

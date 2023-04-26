@@ -29,7 +29,7 @@ public class Main {
             ResultDto resultDto = command.run(tags, usableTags);
 
             // 실패처리
-            if (!resultDto.isSuccess()) {
+            if (resultDto.isFail()) {
                 Tag tag = resultDto.getTag();
                 int count = failCount.getOrDefault(tag, 0);
                 failCount.put(tag, count + 1);
@@ -38,36 +38,43 @@ public class Main {
 
         // 출력 컨텍스트
         StringBuilder builder = new StringBuilder(100);
+        List<String> printLines = new ArrayList<>();
 
+        builder.setLength(0);
+        builder.append("대기중인 태그:");
         while (!tags.isEmpty()) {
             builder.append(' ');
             builder.append(tags.poll());
         }
-        System.out.println("대기중인 태그:" + builder);
-
-        System.out.println("생성실패횟수: " + failCount.getOrDefault(Tag.createFailTag(), 0));
+        printLines.add(builder.toString());
 
         builder.setLength(0);
-        failCount.entrySet().stream()
-                .filter(entry -> entry.getKey().equals(Tag.createFailTag()))
-                .sorted(new Comparator<Map.Entry<Tag, Integer>>() {
-                    @Override
-                    public int compare(Map.Entry<Tag, Integer> entry1, Map.Entry<Tag, Integer> entry2) {
-                        int compareTo = entry2.getValue().compareTo(entry1.getValue());
-                        if (compareTo == 0) {
-                            return entry1.getKey().compareTo(entry2.getKey());
-                        }
+        builder.append("생성실패횟수:");
+        builder.append(' ');
+        builder.append(failCount.getOrDefault(Tag.createFailTag(), 0));
+        printLines.add(builder.toString());
 
-                        return compareTo;
-                    }
-                })
-                .forEach(entry -> {
-                    builder.append(' ');
-                    builder.append(MessageFormat.format("{0}({1})", entry.getKey(), entry.getValue()));
-                });
+        builder.setLength(0);
+        builder.append("태그별 실행실패횟수:");
+        builder.append(' ');
+        builder.append(
+                failCount.entrySet().stream()
+                        .filter(entry -> entry.getKey().equals(Tag.createFailTag()))
+                        .sorted((entry1, entry2)->{
+                            int compareTo = entry2.getValue().compareTo(entry1.getValue());
+                            if (compareTo == 0) {
+                                return entry1.getKey().compareTo(entry2.getKey());
+                            }
 
-        System.out.println("태그별 실행실패횟수: " + builder);
+                            return compareTo;
+                        })
+                        .map((entry)->entry.getKey().toString() + entry.getValue().toString())
+                        .collect(Collectors.joining())
+        );
 
+        for (String line : printLines) {
+            System.out.println(line);
+        }
     }
 
     private static Command createCommand(String[] lineElements) {
